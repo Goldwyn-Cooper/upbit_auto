@@ -25,7 +25,9 @@ def exit_position(balance, candidate):
         send_message('[EXIT]')
         send_message(exit_table)
     for r in exit_table.itertuples():
-        send_message(r.Index)
+        send_message(f'매도 주문 : {r.Index}')
+        client.sell_market_order(
+            f'KRW-{r.Index}', r.balance)
 
 def enter_position(balance, candidate, budget):
     enter_table = balance.join(candidate, how='right')\
@@ -34,4 +36,6 @@ def enter_position(balance, candidate, budget):
         send_message('[ENTER]')
         send_message(enter_table)
     for r in enter_table.itertuples():
-        send_message(r.Index)
+        send_message(f'매수 주문 : {r.Index}')
+        client.buy_market_order(
+            f'KRW-{r.Index}', r.risk * budget)

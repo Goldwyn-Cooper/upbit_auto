@@ -29,8 +29,10 @@ def get_candidate():
 if __name__ == '__main__':
     balance, budget = get_balance()
     send_message(f'보유자산 : ₩{int(budget):,}')
+    send_message('[BALANCE]')
     send_message(balance)
     candidate = get_candidate()
+    send_message('[CANDIDATE]')
     send_message(candidate)
     exit_position(balance, candidate)
     enter_position(balance, candidate, budget)
