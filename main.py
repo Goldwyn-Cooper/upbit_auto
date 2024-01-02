@@ -5,7 +5,7 @@ from src.account import *
 
 def get_candidate():
     fs = get_filtered_symbol()
-    send_message(', '.join(fs))
+    # send_message(', '.join(fs))
     prices = {}
     volatility = {}
     for s in fs:
@@ -20,6 +20,11 @@ def get_candidate():
     cluster['momentum'] = cluster.symbol.apply(scoring)
     risk = lambda x: min(1, 0.01 / (atr(volatility[x], max(FIBO)) / prices[x].close.iloc[-1])) / 4
     cluster['risk'] = cluster.symbol.apply(risk)
+    send_message(
+        cluster            
+            .loc[:, ('group', 'symbol')]
+            .sort_values('group')
+            .set_index('group'))
     return cluster\
                 .loc[(cluster.groupby('group')['momentum'].idxmax())]\
                 .query('momentum > 0')\
@@ -32,8 +37,8 @@ if __name__ == '__main__':
     balance, budget = get_balance()
     send_message(f'보유자산 : ₩{int(budget):,}')
     send_message(balance)
-    candidate = get_candidate()
     send_message('[CANDIDATE]')
+    candidate = get_candidate()
     send_message(candidate)
     exit_position(balance, candidate)
     enter_position(balance, candidate, budget)
