@@ -27,9 +27,10 @@ def get_candidate():
                 .head(4).set_index('symbol')
 
 if __name__ == '__main__':
+    send_message('💻🤖🔄📈🪙')
+    send_message('[BALANCE]')
     balance, budget = get_balance()
     send_message(f'보유자산 : ₩{int(budget):,}')
-    send_message('[BALANCE]')
     send_message(balance)
     candidate = get_candidate()
     send_message('[CANDIDATE]')
