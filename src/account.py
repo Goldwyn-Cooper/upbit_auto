@@ -5,7 +5,9 @@ from pyupbit import Upbit
 import pandas as pd
 # 커스텀
 from src.telegram import send_message
+from src.data import get_price
 
+pd.options.display.float_format = '{:.3f}'.format
 client = Upbit(os.getenv('UPBIT_AK'), os.getenv('UPBIT_SK'))
 
 def get_balance():
@@ -13,9 +15,15 @@ def get_balance():
     df = pd.DataFrame(balance).set_index('currency')\
         .loc[:, ['balance', 'avg_buy_price']].astype(float)\
         .drop('USDT')
-    balance = df.query('avg_buy_price > 0')
     df.loc['KRW'].avg_buy_price = 1
-    return (balance, (df.balance * df.avg_buy_price).sum())
+    balance = df.query('avg_buy_price > 0').copy()
+    # print(balance.index.to_list())
+    balance['mkt_price'] = [(get_price(s).close.iloc[-1] if s != 'KRW' else 1)
+                                   for s in balance.index.to_list()]
+    # return (balance, (df.balance * df.avg_buy_price).sum())
+    return (balance.drop('KRW'),
+            (balance.balance * balance.mkt_price).sum(),
+            (balance.balance * balance.avg_buy_price).sum())
 
 def exit_position(balance, candidate):
     exit_table = balance.join(
